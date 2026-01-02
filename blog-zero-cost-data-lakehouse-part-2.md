@@ -21,16 +21,6 @@ linkedin_post: |
   → Auto table naming from filename (optional pluralization)
   → Streaming download for large remote files
 
-  The approach:
-  CSV → PyArrow → Iceberg schema → Table creation → Data append
-
-  What makes it flexible:
-  • Pluggable catalogs — Nessie REST or SQLite with one env variable
-  • Storage agnostic — any S3-compatible backend works
-  • Auto schema inference — Arrow types map to Iceberg types
-
-  Part 1 was infrastructure. Part 2 is the actual data loading.
-
   Full article with code walkthrough 👇
 
   #ApacheIceberg #DataLakehouse #DataEngineering #PyIceberg #OpenSource

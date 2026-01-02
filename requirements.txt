@@ -4,3 +4,10 @@ python-dotenv>=1.0.0
 structlog>=24.0.0
 boto3>=1.34.0
 requests>=2.31.0
+
+# Query and Analysis
+duckdb>=1.0.0
+pandas>=2.0.0
+jupysql>=0.10.0
+duckdb-engine>=0.9.0
+ipykernel>=6.0.0
