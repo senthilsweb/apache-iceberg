@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cover Image - Part 2 Loading CSV Data into Apache Iceberg Tables</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 50%, #99f6e4 100%);
+    }
+    h1 {
+      color: #134e4a;
+      font-size: 24px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .subtitle {
+      color: #0d9488;
+      font-size: 14px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .card-section {
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card-title {
+      color: #0d9488;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .card-size {
+      color: #0d9488;
+      font-size: 13px;
+      margin-bottom: 15px;
+    }
+    .card-container {
+      box-shadow: 0 15px 50px rgba(13,148,136,0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 100%;
+    }
+    .greeting-svg {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .download-btn {
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #0a0a1a;
+      background: linear-gradient(135deg, #64d2b1 0%, #3d9970 100%);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(100, 210, 177, 0.3);
+    }
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(100, 210, 177, 0.5);
+    }
+    .download-btn.png {
+      background: linear-gradient(135deg, #ff6b9d 0%, #e91e63 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+    }
+    .download-btn.png:hover {
+      box-shadow: 0 6px 25px rgba(255, 107, 157, 0.5);
+    }
+    canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Cover Image: Data Lakehouse Part 2</h1>
+  <p class="subtitle">Download the cover image for your blog post</p>
+
+  <!-- LinkedIn Post Size -->
+  <div class="card-section">
+    <div class="card-title">📱 Blog Cover Image</div>
+    <div class="card-size">1200 × 627 pixels</div>
+    <div class="card-container">
+      <svg id="svg-cover" class="greeting-svg" viewBox="0 0 1200 627" xmlns="http://www.w3.org/2000/svg" width="1200" height="627">
+        <defs>
+          <!-- Light teal/green gradient background -->
+          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#e0f7f4;stop-opacity:1" />
+            <stop offset="30%" style="stop-color:#b2f0e8;stop-opacity:1" />
+            <stop offset="70%" style="stop-color:#7ee8d7;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#4fd1c5;stop-opacity:1" />
+          </linearGradient>
+          
+          <!-- Pink accent gradient -->
+          <linearGradient id="pinkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#ff6b9d;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#e91e63;stop-opacity:1" />
+          </linearGradient>
+          
+          <!-- Dark teal accent gradient -->
+          <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0d9488;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#065f56;stop-opacity:1" />
+          </linearGradient>
+          
+          <!-- Blue accent -->
+          <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+          </linearGradient>
+          
+          <!-- Orange/Yellow accent -->
+          <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+          </linearGradient>
+          
+          <!-- Glow filters -->
+          <filter id="greenGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          
+          <!-- Drop shadow for cards -->
+          <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0d9488" flood-opacity="0.3"/>
+          </filter>
+        </defs>
+        
+        <!-- Main Background -->
+        <rect width="1200" height="627" fill="url(#bgGrad)"/>
+        
+        <!-- Decorative circles -->
+        <circle cx="80" cy="550" r="100" fill="#fbbf24" opacity="0.6"/>
+        <circle cx="200" cy="480" r="60" fill="#0d9488" opacity="0.4"/>
+        <circle cx="1100" cy="80" r="120" fill="#0d9488" opacity="0.3"/>
+        <circle cx="1050" cy="520" r="80" fill="#fbbf24" opacity="0.5"/>
+        <circle cx="950" cy="580" r="50" fill="#3b82f6" opacity="0.4"/>
+        
+        <!-- Subtle pattern overlay -->
+        <g opacity="0.1">
+          <circle cx="300" cy="100" r="200" fill="none" stroke="#0d9488" stroke-width="1"/>
+          <circle cx="900" cy="400" r="250" fill="none" stroke="#0d9488" stroke-width="1"/>
+        </g>
+        
+        <!-- Part 2 Badge -->
+        <g transform="translate(60, 40)">
+          <rect width="100" height="36" rx="18" fill="url(#pinkGrad)"/>
+          <text x="50" y="24" font-family="system-ui, sans-serif" font-size="16" font-weight="700" fill="#ffffff" text-anchor="middle">PART 2</text>
+        </g>
+        
+        <!-- Series indicator -->
+        <text x="180" y="65" font-family="system-ui, sans-serif" font-size="14" fill="#0d9488" font-weight="600">Data Lakehouse Series</text>
+        
+        <!-- Main title -->
+        <text x="600" y="130" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="800" fill="#134e4a" text-anchor="middle">
+          Loading CSV Data into Apache Iceberg Tables
+        </text>
+        
+        <!-- Accent line -->
+        <rect x="300" y="150" width="600" height="4" rx="2" fill="url(#greenGrad)"/>
+        
+        <!-- Subtitle -->
+        <text x="600" y="195" font-family="system-ui, sans-serif" font-size="22" fill="#0d9488" font-weight="600" text-anchor="middle">
+          with PyIceberg and PyArrow
+        </text>
+        
+        <!-- Flow diagram -->
+        <g transform="translate(100, 235)">
+          <!-- CSV Box -->
+          <g transform="translate(0, 0)" filter="url(#cardShadow)">
+            <rect width="140" height="85" rx="12" fill="#ffffff" stroke="#0d9488" stroke-width="2"/>
+            <text x="70" y="38" font-family="system-ui, sans-serif" font-size="28" fill="#0d9488" text-anchor="middle">📄</text>
+            <text x="70" y="65" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#134e4a" text-anchor="middle">CSV File</text>
+          </g>
+          
+          <!-- Arrow 1 -->
+          <g transform="translate(150, 32)">
+            <line x1="0" y1="10" x2="60" y2="10" stroke="#0d9488" stroke-width="4"/>
+            <polygon points="60,10 48,3 48,17" fill="#0d9488"/>
+          </g>
+          
+          <!-- PyArrow Box -->
+          <g transform="translate(220, 0)" filter="url(#cardShadow)">
+            <rect width="140" height="85" rx="12" fill="#ffffff" stroke="#0d9488" stroke-width="2"/>
+            <text x="70" y="38" font-family="system-ui, sans-serif" font-size="28" fill="#0d9488" text-anchor="middle">🏹</text>
+            <text x="70" y="65" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#134e4a" text-anchor="middle">PyArrow</text>
+          </g>
+          
+          <!-- Arrow 2 -->
+          <g transform="translate(370, 32)">
+            <line x1="0" y1="10" x2="60" y2="10" stroke="#0d9488" stroke-width="4"/>
+            <polygon points="60,10 48,3 48,17" fill="#0d9488"/>
+          </g>
+          
+          <!-- Schema Box -->
+          <g transform="translate(440, 0)" filter="url(#cardShadow)">
+            <rect width="140" height="85" rx="12" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+            <text x="70" y="38" font-family="system-ui, sans-serif" font-size="28" fill="#3b82f6" text-anchor="middle">📋</text>
+            <text x="70" y="65" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#134e4a" text-anchor="middle">Schema</text>
+          </g>
+          
+          <!-- Arrow 3 -->
+          <g transform="translate(590, 32)">
+            <line x1="0" y1="10" x2="60" y2="10" stroke="#0d9488" stroke-width="4"/>
+            <polygon points="60,10 48,3 48,17" fill="#0d9488"/>
+          </g>
+          
+          <!-- Catalog Box -->
+          <g transform="translate(660, 0)" filter="url(#cardShadow)">
+            <rect width="140" height="85" rx="12" fill="#ffffff" stroke="#e91e63" stroke-width="2"/>
+            <text x="70" y="38" font-family="system-ui, sans-serif" font-size="28" fill="#e91e63" text-anchor="middle">📚</text>
+            <text x="70" y="65" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#134e4a" text-anchor="middle">Catalog</text>
+          </g>
+          
+          <!-- Arrow 4 -->
+          <g transform="translate(810, 32)">
+            <line x1="0" y1="10" x2="60" y2="10" stroke="#0d9488" stroke-width="4"/>
+            <polygon points="60,10 48,3 48,17" fill="#0d9488"/>
+          </g>
+          
+          <!-- Iceberg Box -->
+          <g transform="translate(880, 0)" filter="url(#cardShadow)">
+            <rect width="140" height="85" rx="12" fill="#0d9488" stroke="#065f56" stroke-width="2"/>
+            <text x="70" y="38" font-family="system-ui, sans-serif" font-size="28" fill="#ffffff" text-anchor="middle">🧊</text>
+            <text x="70" y="65" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">Iceberg Table</text>
+          </g>
+        </g>
+        
+        <!-- Features row -->
+        <g transform="translate(100, 375)">
+          <!-- Feature 1 -->
+          <g transform="translate(0, 0)">
+            <rect width="230" height="65" rx="10" fill="#ffffff" stroke="#0d9488" stroke-width="2" filter="url(#cardShadow)"/>
+            <text x="22" y="28" font-family="system-ui, sans-serif" font-size="18" fill="#0d9488" font-weight="700">✓</text>
+            <text x="48" y="28" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#134e4a">Pluggable Catalogs</text>
+            <text x="48" y="48" font-family="system-ui, sans-serif" font-size="12" fill="#0d9488">Nessie REST or SQLite</text>
+          </g>
+          
+          <!-- Feature 2 -->
+          <g transform="translate(250, 0)">
+            <rect width="230" height="65" rx="10" fill="#ffffff" stroke="#e91e63" stroke-width="2" filter="url(#cardShadow)"/>
+            <text x="22" y="28" font-family="system-ui, sans-serif" font-size="18" fill="#e91e63" font-weight="700">✓</text>
+            <text x="48" y="28" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#134e4a">Storage Agnostic</text>
+            <text x="48" y="48" font-family="system-ui, sans-serif" font-size="12" fill="#0d9488">Any S3-compatible backend</text>
+          </g>
+          
+          <!-- Feature 3 -->
+          <g transform="translate(500, 0)">
+            <rect width="230" height="65" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="2" filter="url(#cardShadow)"/>
+            <text x="22" y="28" font-family="system-ui, sans-serif" font-size="18" fill="#3b82f6" font-weight="700">✓</text>
+            <text x="48" y="28" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#134e4a">Auto Schema Inference</text>
+            <text x="48" y="48" font-family="system-ui, sans-serif" font-size="12" fill="#0d9488">Arrow → Iceberg types</text>
+          </g>
+          
+          <!-- Feature 4 -->
+          <g transform="translate(750, 0)">
+            <rect width="230" height="65" rx="10" fill="#ffffff" stroke="#0d9488" stroke-width="2" filter="url(#cardShadow)"/>
+            <text x="22" y="28" font-family="system-ui, sans-serif" font-size="18" fill="#0d9488" font-weight="700">✓</text>
+            <text x="48" y="28" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#134e4a">Full Metadata</text>
+            <text x="48" y="48" font-family="system-ui, sans-serif" font-size="12" fill="#0d9488">Time-travel & snapshots</text>
+          </g>
+        </g>
+        
+        <!-- Quote box -->
+        <g transform="translate(100, 470)">
+          <rect width="1000" height="55" rx="28" fill="#ffffff" opacity="0.9" filter="url(#cardShadow)"/>
+          <text x="500" y="35" font-family="Georgia, serif" font-size="17" font-style="italic" fill="#134e4a" text-anchor="middle">
+            "The infrastructure was Part 1. Loading data is Part 2. Now the lakehouse is ready for queries."
+          </text>
+        </g>
+        
+        <!-- Footer -->
+        <rect x="0" y="545" width="1200" height="82" fill="#0d9488" opacity="0.95"/>
+        
+        <!-- Price tag -->
+       
+        
+        <!-- Links -->
+        <text x="950" y="575" font-family="system-ui, sans-serif" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">
+          🌐 www.senthilsweb.com
+        </text>
+        <text x="950" y="605" font-family="system-ui, sans-serif" font-size="15" font-weight="600" fill="#fbbf24" text-anchor="middle">
+          💻 github.com/senthilsweb
+        </text>
+        </text>
+        
+      </svg>
+    </div>
+    <div class="btn-group">
+      <button class="download-btn" onclick="downloadSVG()">
+        📥 Download SVG
+      </button>
+      <button class="download-btn png" onclick="downloadPNG()">
+        🖼️ Download PNG
+      </button>
+    </div>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const filename = 'ci_part-2-loading-csv-data-into-apache-iceberg-tables-with-pyiceberg-and-pyarrow';
+    
+    function downloadSVG() {
+      const svg = document.getElementById('svg-cover');
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      
+      const downloadLink = document.createElement('a');
+      downloadLink.href = svgUrl;
+      downloadLink.download = filename + '.svg';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(svgUrl);
+    }
+
+    function downloadPNG() {
+      const svg = document.getElementById('svg-cover');
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.getElementById('canvas');
+        // Use 2x resolution for better clarity
+        const scale = 2;
+        canvas.width = 1200 * scale;
+        canvas.height = 627 * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(scale, scale);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, 1200, 627);
+        
+        canvas.toBlob(function(blob) {
+          const pngUrl = URL.createObjectURL(blob);
+          const downloadLink = document.createElement('a');
+          downloadLink.href = pngUrl;
+          downloadLink.download = filename + '.png';
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          URL.revokeObjectURL(pngUrl);
+          URL.revokeObjectURL(url);
+        }, 'image/png', 1.0);
+      };
+      img.src = url;
+    }
+  </script>
+</body>
+</html>
