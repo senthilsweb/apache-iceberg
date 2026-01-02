@@ -150,11 +150,6 @@ Successfully tested with:
 - **Data Source**: Remote CSV from GitHub
 - **Result**: 49,990 rows loaded to `ticketdb.users` table
 
-## 📚 Related Blog Posts
-
-- [Part 1: Building a Zero-Cost Data Lakehouse](https://www.senthilsweb.com/blog)
-- [Part 2: Loading CSV Data into Apache Iceberg Tables](https://www.senthilsweb.com/blog)
-
-## 📄 License
+##  License
 
 MIT License
