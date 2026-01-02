@@ -52,20 +52,40 @@ cp sample.env .env
 ### 3. Load Data
 
 ```bash
-# From remote URL
+# Option A: Using Nessie REST Catalog (Production)
 ICE_SOURCE_PATH="https://raw.githubusercontent.com/senthilsweb/datasets/main/ticket/users.csv" \
 ICE_NAMESPACE="ticketdb" \
 ICE_TABLE_NAME="" \
+ICE_CATALOG_TYPE="rest" \
+ICE_NESSIE_URI="https://nessie-iceberg.fly.dev/iceberg/" \
+ICE_WAREHOUSE_PATH="s3://iceberg-demo/warehouse" \
+R2_ENDPOINT="https://your-account.r2.cloudflarestorage.com" \
+R2_ACCESS_KEY="your-access-key" \
+R2_SECRET_KEY="your-secret-key" \
 python bot_iceberg_loader.py
 
-# From local file
+# Option B: Using SQLite Catalog (Local Development)
 ICE_SOURCE_PATH="./data/sales.csv" \
+ICE_NAMESPACE="default" \
 ICE_TABLE_NAME="sales" \
+ICE_CATALOG_TYPE="sql" \
+ICE_CATALOG_DB_PATH="./iceberg_catalog.db" \
+ICE_WAREHOUSE_PATH="s3://your-bucket/warehouse" \
+R2_ENDPOINT="https://your-account.r2.cloudflarestorage.com" \
+R2_ACCESS_KEY="your-access-key" \
+R2_SECRET_KEY="your-secret-key" \
 python bot_iceberg_loader.py
 
-# From directory with glob pattern
+# Directory with glob pattern (Nessie)
 ICE_SOURCE_PATH="./data/" \
 ICE_GLOB_PATTERN="*.csv" \
+ICE_NAMESPACE="imports" \
+ICE_CATALOG_TYPE="rest" \
+ICE_NESSIE_URI="https://nessie-iceberg.fly.dev/iceberg/" \
+ICE_WAREHOUSE_PATH="s3://iceberg-demo/warehouse" \
+R2_ENDPOINT="https://your-account.r2.cloudflarestorage.com" \
+R2_ACCESS_KEY="your-access-key" \
+R2_SECRET_KEY="your-secret-key" \
 python bot_iceberg_loader.py
 ```
 
