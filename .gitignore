@@ -1,0 +1,41 @@
+# Dependencies
+env/
+__pycache__/
+*.pyc
+.Python
+venv/
+.venv/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs (keep folder, ignore contents)
+logs/*
+!logs/.gitkeep
+
+# Secrets
+fly.secrets.md
+*.pem
+*.key
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Temp
+tmp/
+temp/
+*.tmp

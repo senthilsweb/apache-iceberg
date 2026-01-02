@@ -1,0 +1,39 @@
+# fly.toml app configuration file generated for nessie-iceberg on 2025-12-05T08:52:59-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'nessie-iceberg'
+primary_region = 'ams'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  # Version Store - PostgreSQL (Neon)
+  NESSIE_VERSION_STORE_TYPE = "JDBC"
+  
+  # Iceberg REST Catalog - Warehouse Configuration
+  NESSIE_CATALOG_DEFAULT_WAREHOUSE = "warehouse"
+  
+  # S3/R2 Object Storage Configuration
+  NESSIE_CATALOG_SERVICE_S3_DEFAULT_OPTIONS_PATH_STYLE_ACCESS = "true"
+  NESSIE_CATALOG_SERVICE_S3_DEFAULT_OPTIONS_REGION = "auto"
+  
+  # External URI configuration for HTTPS proxy
+  NESSIE_SERVER_SEND_STACKTRACE_TO_CLIENT = "false"
+  QUARKUS_HTTP_PROXY_PROXY_ADDRESS_FORWARDING = "true"
+  QUARKUS_HTTP_PROXY_ENABLE_FORWARDED_HOST = "true"
+  NESSIE_CATALOG_SERVICE_BASE_URI = "https://nessie-iceberg.fly.dev/"
+
+[http_service]
+  internal_port = 19120
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
